@@ -32,7 +32,7 @@ int main()
 	hints.ai_protocol = IPPROTO_TCP;
 
 	//Instead of "localhost" he did "127.0.0.1" could apparently use either (they are the same??)
-	if (getaddrinfo("10.190.14.53", "8888", &hints, &ptr) != 0)
+	if (getaddrinfo("localhost", "5000", &hints, &ptr) != 0)
 	{
 		printf("Getaddrinfo failed! %d\n", WSAGetLastError());
 		WSACleanup(); //Cleanup the resources we were using
@@ -68,7 +68,7 @@ int main()
 	const unsigned int BUF_LEN = 512;
 
 	char recv_buf[BUF_LEN];
-	memset(recv_buf, 0, BUF_LEN);
+	//memset(recv_buf, 0, BUF_LEN);
 
 	//Change to non-blocking mode
 	u_long mode = 1; // 0 is for blocking, 1 is for non blocking
@@ -76,8 +76,13 @@ int main()
 
 	int sError = -1;
 	int bytes_received = -1;
+	//
+	char buf[4096];
+	std::string userInput;
 
-	for (;;) //Infinite loop
+
+
+	do
 	{
 		bytes_received = recv(cliSocket, recv_buf, BUF_LEN, 0);
 		sError = WSAGetLastError();
@@ -87,30 +92,42 @@ int main()
 			printf("Received from server: %s\n", recv_buf);
 			memset(recv_buf, 0, BUF_LEN);
 		}
-	}
 
-	if (recv(cliSocket, recv_buf, BUF_LEN, 0) > 0)
-	{
-		printf("Received from server: %s\n", recv_buf);
-	}
-	else
-	{
-		printf("recv() Error: %d\n", WSAGetLastError());
-	}
+		std::cout << ">";
+		std::getline(std::cin, userInput);
 
+		if (userInput.size() > 0)		// Make sure the user has typed in something
+		{
+			// Send the text
+			int sendResult = send(cliSocket, userInput.c_str(), userInput.size() + 1, 0);
+			if (sendResult != SOCKET_ERROR)
+			{
+				// Wait for response
+				ZeroMemory(buf, 4096);
+				int bytesReceived = recv(cliSocket, buf, 4096, 0);
+				if (bytesReceived > 0)
+				{
+					// Echo response to console
+					std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << std::endl;
+				}
+			}
+		}
+	} while (userInput.size() > 0);
 	//Shutdown the socket
-
-	if (shutdown(cliSocket, SD_BOTH) == SOCKET_ERROR)
-	{
-		printf("Shutdown failed! %d\n", WSAGetLastError());
-		closesocket(cliSocket);
-		WSACleanup();
-		return 1;
-	}
-
 	closesocket(cliSocket);
-	freeaddrinfo(ptr);
 	WSACleanup();
 
-	return 0;
+	//if (shutdown(cliSocket, SD_BOTH) == SOCKET_ERROR)
+	//{
+	//	printf("Shutdown failed! %d\n", WSAGetLastError());
+	//	closesocket(cliSocket);
+	//	WSACleanup();
+	//	return 1;
+	//}
+	//
+	//closesocket(cliSocket);
+	//freeaddrinfo(ptr);
+	//WSACleanup();
+	//
+	//return 0;
 }

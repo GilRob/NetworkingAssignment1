@@ -1,2 +1,3 @@
 ﻿  main.cpp
-  NonBlockingServer.vcxproj -> C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\NonBlockingServer\Debug\NonBlockingServer.exe
+C:\Users\jessi\Desktop\3rd year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(142,24): warning C4018:  '<': signed/unsigned mismatch
+  NonBlockingServer.vcxproj -> C:\Users\jessi\Desktop\3rd year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\Debug\NonBlockingServer.exe
