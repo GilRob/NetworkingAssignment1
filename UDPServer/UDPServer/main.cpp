@@ -58,25 +58,62 @@ int main() {
 		return 1;
 	}
 
-	printf("Waiting for Data...\n");
+	// Listen on socket
+
+	/*if (listen(server_socket, SOMAXCONN) == SOCKET_ERROR)
+	{
+		printf("Listen failed: %d\n", WSAGetLastError());
+		closesocket(server_socket);
+		freeaddrinfo(ptr);
+		WSACleanup();
+		return 1;
+	}
+
+	printf("Waiting for Connections...\n");*/
+
+	// Accept a connection (multiple clients --> threads)
+
+	SOCKET client_socket1;
+
+	client_socket1 = accept(server_socket, NULL, NULL);
+
+	if (client_socket1 == INVALID_SOCKET) {
+		printf("Accept() failed %d\n", WSAGetLastError());
+		closesocket(server_socket);
+		freeaddrinfo(ptr);
+		WSACleanup();
+		return 1;
+
+	}
+
+	printf("Client1 connected!!\n");
+
+	SOCKET client_socket2;
+
+	client_socket2 = accept(server_socket, NULL, NULL);
+
+	if (client_socket2 == INVALID_SOCKET) {
+		printf("Accept() failed %d\n", WSAGetLastError());
+		closesocket(server_socket);
+		freeaddrinfo(ptr);
+		WSACleanup();
+		return 1;
+
+	}
+
+	printf("Client2 connected!!\n");
 
 	// Receive msg from client
 	const unsigned int BUF_LEN = 512;
 
 	char recv_buf[BUF_LEN];
 
-
+	char send_buf[BUF_LEN];
 
 	// Struct that will hold the IP address of the client that sent the message (we don't have accept() anymore to learn the address)
 	struct sockaddr_in fromAddr;
 	int fromlen;
 	fromlen = sizeof(fromAddr);
-
-	SOCKET cliSocket;
-	cliSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
-	SOCKET cliSocket2;
-	cliSocket2 = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	memset(recv_buf, 0, BUF_LEN);
 	if (recvfrom(server_socket, recv_buf, sizeof(recv_buf), 0, (struct sockaddr*) & fromAddr, &fromlen) == SOCKET_ERROR) {

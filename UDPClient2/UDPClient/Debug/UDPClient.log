@@ -1,3 +1,3 @@
 ﻿  main.cpp
-C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\UDPClient\UDPClient\main.cpp(62,7): warning C4101:  'recv_buf': unreferenced local variable
-  UDPClient.vcxproj -> C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\UDPClient\Debug\UDPClient.exe
+C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\NetworkingAssignment1\UDPClient2\UDPClient\main.cpp(62,7): warning C4101:  'recv_buf': unreferenced local variable
+  UDPClient.vcxproj -> C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\NetworkingAssignment1\UDPClient2\Debug\UDPClient.exe
