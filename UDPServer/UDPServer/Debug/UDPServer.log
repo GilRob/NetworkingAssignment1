@@ -1,3 +1,4 @@
 ﻿  main.cpp
-C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\UDPServer\UDPServer\main.cpp(96,8): warning C4101:  'ipbuf': unreferenced local variable
-  UDPServer.vcxproj -> C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\UDPServer\Debug\UDPServer.exe
+C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\NetworkingAssignment1\UDPServer\UDPServer\main.cpp(111,7): warning C4101:  'send_buf': unreferenced local variable
+C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\NetworkingAssignment1\UDPServer\UDPServer\main.cpp(136,8): warning C4101:  'ipbuf': unreferenced local variable
+  UDPServer.vcxproj -> C:\Users\gilro\OneDrive\Documents\Third Year\Second Semester\Networking\Assignment1\NetworkingAssignment1\UDPServer\Debug\UDPServer.exe
