@@ -3,9 +3,43 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #pragma comment(lib, "ws2_32.lib") //He did a capital 'W'
 
+SOCKET cliSocket;
+bool isRunning = true;
+char buf[4096];
+std::string userInput;
+
+///FUNCTION TO RECIEVE MESSAGES///
+void MsgReceive()
+{
+	while (isRunning == true)
+	{
+		ZeroMemory(buf, 4096);
+		int bytesReceived = recv(cliSocket, buf, 4096, 0);
+		if (bytesReceived > 0)
+		{
+			// Echo response to console - this is what collects message from the server
+			std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << std::endl;
+		}
+	}
+}
+///FUNCTION TO SEND MESSAGES///
+void MsgSend()
+{
+	while (isRunning == true)
+	{
+		std::cout << ">";
+		std::getline(std::cin, userInput);
+		if (userInput.size() > 0)		// Make sure the user has typed in something
+		{
+			// Send the text
+			int sendResult = send(cliSocket, userInput.c_str(), userInput.size() + 1, 0);
+		}
+	}
+}
 int main()
 {
 	//Initialize Winsock
@@ -39,8 +73,7 @@ int main()
 		return 1;
 	}
 
-	SOCKET cliSocket;
-	cliSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	cliSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (cliSocket == INVALID_SOCKET)
 	{
@@ -67,53 +100,31 @@ int main()
 
 	const unsigned int BUF_LEN = 512;
 
-	char recv_buf[BUF_LEN];
+	//char recv_buf[BUF_LEN];
 	//memset(recv_buf, 0, BUF_LEN);
 
 	//Change to non-blocking mode
 	u_long mode = 1; // 0 is for blocking, 1 is for non blocking
 	ioctlsocket(cliSocket, FIONBIO, &mode);
-	
+
 	int sError = -1;
 	int bytes_received = -1;
-	//
-	char buf[4096];
-	std::string userInput;
-	
-	
 
-	do
+	//bytes_received = recv(cliSocket, recv_buf, BUF_LEN, 0);
+	//sError = WSAGetLastError();
+	//if (recv(cliSocket, recv_buf, BUF_LEN, 0) > 0)
+	//	printf("Received from server: %s\n", recv_buf);
+	//else printf("recv() error: %d\n", WSAGetLastError());
+
+	std::thread t1(MsgReceive);
+	std::thread t2(MsgSend);
+
+
+	while (isRunning == true)
 	{
-		bytes_received = recv(cliSocket, recv_buf, BUF_LEN, 0);
-		sError = WSAGetLastError();
-
-		if (sError != WSAEWOULDBLOCK && bytes_received > 0)
-		{
-			printf("Received from server: %s\n", recv_buf);
-			memset(recv_buf, 0, BUF_LEN);
-		}
-
-		std::cout << ">";
-		std::getline(std::cin, userInput);
-
-		if (userInput.size() > 0)		// Make sure the user has typed in something
-		{
-			// Send the text
-			int sendResult = send(cliSocket, userInput.c_str(), userInput.size() + 1, 0);
-			if (sendResult != SOCKET_ERROR)
-			{
-				// Wait for response
-				ZeroMemory(buf, 4096);
-				int bytesReceived = recv(cliSocket, buf, 4096, 0);
-				if (bytesReceived > 0)
-				{
-					// Echo response to console
-					std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << std::endl;
-				}
-			}
-		}
-	} while (userInput.size() > 0);
-	//Shutdown the socket
+		t1.join();
+		t2.join();
+	}
 	closesocket(cliSocket);
 	WSACleanup();
 
