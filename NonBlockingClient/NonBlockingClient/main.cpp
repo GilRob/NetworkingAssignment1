@@ -32,7 +32,7 @@ int main()
 	hints.ai_protocol = IPPROTO_TCP;
 
 	//Instead of "localhost" he did "127.0.0.1" could apparently use either (they are the same??)
-	if (getaddrinfo("10.190.14.53", "8888", &hints, &ptr) != 0)
+	if (getaddrinfo("localhost", "5000", &hints, &ptr) != 0)
 	{
 		printf("Getaddrinfo failed! %d\n", WSAGetLastError());
 		WSACleanup(); //Cleanup the resources we were using
@@ -65,10 +65,13 @@ int main()
 
 	//Create a buffer
 
-	const unsigned int BUF_LEN = 512;
+	/*const unsigned int BUF_LEN = 512;
 
 	char recv_buf[BUF_LEN];
-	memset(recv_buf, 0, BUF_LEN);
+	memset(recv_buf, 0, BUF_LEN);*/
+
+	char buf[4096];
+	std::string userInput;
 
 	//Change to non-blocking mode
 	u_long mode = 1; // 0 is for blocking, 1 is for non blocking
@@ -77,26 +80,38 @@ int main()
 	int sError = -1;
 	int bytes_received = -1;
 
-	for (;;) //Infinite loop
+	do
 	{
-		bytes_received = recv(cliSocket, recv_buf, BUF_LEN, 0);
+		//Prompt the use for some words
+		std::cout << "Chat: ";
+		std::getline(std::cin, userInput);
+
+		if (userInput.size() > 0) //Make sure user typed something
+		{
+			//sends text
+			int sendResult = send(cliSocket, userInput.c_str(), userInput.size() + 1, 0);
+			if (sendResult != SOCKET_ERROR)
+			{
+				//Wait for repsonse
+				ZeroMemory(buf, 4096);
+				bytes_received = recv(cliSocket, buf, 4096, 0);
+				if (bytes_received > 0)
+				{
+					std::cout << "SERVER> " << std::string(buf, 0, bytes_received) << std::endl;
+				}
+			}
+		}
+
+		//bytes_received = recv(cliSocket, recv_buf, BUF_LEN, 0);
 		sError = WSAGetLastError();
 
 		if (sError != WSAEWOULDBLOCK && bytes_received > 0)
 		{
-			printf("Received from server: %s\n", recv_buf);
-			memset(recv_buf, 0, BUF_LEN);
+			printf("Received from server: %s\n", buf);
+			memset(buf, 0, 4096);
 		}
-	}
 
-	if (recv(cliSocket, recv_buf, BUF_LEN, 0) > 0)
-	{
-		printf("Received from server: %s\n", recv_buf);
-	}
-	else
-	{
-		printf("recv() Error: %d\n", WSAGetLastError());
-	}
+	} while (userInput.size() > 0);
 
 	//Shutdown the socket
 
