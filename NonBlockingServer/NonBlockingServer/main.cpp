@@ -9,21 +9,57 @@
 char buf[4096];
 SOCKET sock;
 fd_set master;
-SOCKET serverSocket;
-SOCKET outSock ;
+fd_set copyGame;
+fd_set gameSockets;
+SOCKET serverSocket;	
+SOCKET outSock;
+SOCKET outGame;
+SOCKET clientSocket;
 
 void printOnline()
 {
 	//for the number of sockets in master (where its stored)
 	for (int i = 0; i < master.fd_count; i++)
 	{
-		outSock = master.fd_array[i];
+		SOCKET tempSock = master.fd_array[i];
 
 		std::ostringstream oss;
-		oss << "SOCKET #" << outSock << ": IS ONLINE TEST" << buf << "\r\n";
+		oss << "SOCKET #" << tempSock << ": IS CURRENTLY ONLINE" << "\r\n";
 		//std::string strOut = oss.str();
 
-		std::cout << outSock<< std::endl;
+		std::cout << tempSock << std::endl;
+
+		std::string strOut = oss.str();
+
+		for (int j = 0; j < master.fd_count; j++)
+		{
+			send(master.fd_array[j], strOut.c_str(), strOut.size() + 1, 0);
+		}
+		std::cout << i << std::endl;
+		//send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+		//if (outSock != serverSocket && outSock != sock)
+		//{
+		//    std::ostringstream ss;
+		//    ss << "SOCKET #" << sock << ": IS ONLINE" << buf << "\r\n";
+		//    std::string strOut = ss.str();
+		//
+		//    send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+		//}
+	}
+}
+
+void printGame()
+{
+	//for the number of sockets in master (where its stored)
+	for (int i = 0; i < gameSockets.fd_count; i++)
+	{
+		outGame = gameSockets.fd_array[i];
+
+		std::ostringstream oss;
+		//oss << "SOCKET #" << outSock << ": IS ONLINE TEST" << buf << "\r\n";
+		//std::string strOut = oss.str();
+
+		std::cout << outGame << std::endl;
 		//send(outSock, strOut.c_str(), strOut.size() + 1, 0);
 		//if (outSock != serverSocket && outSock != sock)
 		//{
@@ -105,13 +141,16 @@ int main()
 
 	//Create the master file descriptor set and zero it
 	FD_ZERO(&master);
+	FD_ZERO(&gameSockets);
 
 	FD_SET(serverSocket, &master);
+	FD_SET(serverSocket, &gameSockets);
 
 	bool running = true;
 
 	while (running)
 	{
+		
 		fd_set copy = master;
 
 		//Who talking?
@@ -124,7 +163,7 @@ int main()
 			if (sock == serverSocket)
 			{
 				//Accept new connection
-				SOCKET clientSocket = accept(serverSocket, nullptr, nullptr);
+				clientSocket = accept(serverSocket, nullptr, nullptr);
 
 				//Add new connection
 				FD_SET(clientSocket, &master);
@@ -159,6 +198,18 @@ int main()
 					closesocket(sock);
 					FD_CLR(sock, &master);
 				}
+				else if (buf[0] == 'g')
+				{
+					std::cout << "in game" << std::endl;
+					//copyGame = gameSockets;
+					//SOCKET clientSocket = accept(serverSocket, nullptr, nullptr);
+					//SOCKET inGame = accept(serverSocket, nullptr, nullptr);
+					//Add new connection
+					//FD_CLR(sock, &master);
+					FD_SET(sock, &gameSockets);
+					FD_CLR(sock, &master);
+					
+				}
 				else if (buf[0]== 'd')
 				{
 					printOnline();
@@ -174,6 +225,31 @@ int main()
 				else if (buf[0] == 'o')
 				{
 					std::cout << sock << std::endl;
+				}
+				else if (buf[0] == 'v')
+				{
+					for (int u = 0; u < gameSockets.fd_count; u++)
+					{
+						outGame = gameSockets.fd_array[u];
+						std::cout << outGame << std::endl;
+					}
+					//zprintGame();
+				}
+				//Check to see if it is a command. \quit kills the server
+				else if (buf[0] == '-')
+				{
+					running = false;
+					break;
+					//Is the command quit?
+					std::string cmd = std::string(buf, bytesIn);
+					if (cmd == "quit")
+					{
+						running = false;
+						break;
+					}
+
+					//unknown command
+					//continue;
 				}
 				else
 				{
@@ -193,19 +269,44 @@ int main()
 					}
 
 					//Send message to other clients, and definiately NOT the listening socket
-
+					
 					for (int i = 0; i < master.fd_count; i++)
 					{
 						outSock = master.fd_array[i];
-						if (outSock != serverSocket && outSock != sock)
-						{
-							std::ostringstream ss;
-							ss << "SOCKET #" << sock << ": " << buf << "\r\n";
-							std::string strOut = ss.str();
+							if (outSock != serverSocket && outSock != sock)
+							{
+								std::ostringstream ss;
+								ss << "SOCKET #" << sock << ": " << buf << "\r\n";
+								std::string strOut = ss.str();
 
-							send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+								send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+							}
+							
+					}
+					for (int j = 0; j < gameSockets.fd_count; j++)
+					{
+						outGame = gameSockets.fd_array[j];
+						if (outGame != serverSocket && outGame != sock)
+						{
+							std::ostringstream tt;
+							tt << "IN GAME: " << buf << "\r\n";
+							std::string outP = tt.str();
+
+							send(outGame, outP.c_str(), outP.size() + 1, 0);
 						}
 					}
+					//for (int i = 0; i < gameSockets.fd_count; i++)
+					//{
+					//	outGame = gameSockets.fd_array[i];
+					//	if (outGame != serverSocket && outGame != sock)
+					//	{
+					//		std::ostringstream ss;
+					//		ss << "TEST" << buf << "\r\n";
+					//		std::string outP = ss.str();
+					//
+					//		send(outSock, outP.c_str(), outP.size() + 1, 0);
+					//	}
+					//}
 				}
 			}
 		}

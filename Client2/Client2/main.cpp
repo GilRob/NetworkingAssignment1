@@ -11,6 +11,7 @@ SOCKET cliSocket;
 bool isRunning = true;
 char buf[4096];
 std::string userInput;
+std::string ipAddress;
 
 ///FUNCTION TO RECIEVE MESSAGES///
 void MsgReceive()
@@ -22,7 +23,7 @@ void MsgReceive()
 		if (bytesReceived > 0)
 		{
 			// Echo response to console - this is what collects message from the server
-			std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << std::endl;
+			std::cout << std::string(buf, 0, bytesReceived) << std::endl;
 		}
 	}
 }
@@ -65,8 +66,12 @@ int main()
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 
+	std::cout << "Enter the host IP address> ";
+	std::getline(std::cin, ipAddress);
+	const char* theAddy = ipAddress.c_str();
+
 	//Instead of "localhost" he did "127.0.0.1" could apparently use either (they are the same??)
-	if (getaddrinfo("localhost", "5000", &hints, &ptr) != 0)
+	if (getaddrinfo(theAddy, "5000", &hints, &ptr) != 0)
 	{
 		printf("Getaddrinfo failed! %d\n", WSAGetLastError());
 		WSACleanup(); //Cleanup the resources we were using
