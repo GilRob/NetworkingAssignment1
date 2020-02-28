@@ -6,6 +6,35 @@
 #include <sstream>
 
 #pragma comment(lib, "ws2_32.lib") //He did a capital 'W'
+char buf[4096];
+SOCKET sock;
+fd_set master;
+SOCKET serverSocket;
+SOCKET outSock ;
+
+void printOnline()
+{
+	//for the number of sockets in master (where its stored)
+	for (int i = 0; i < master.fd_count; i++)
+	{
+		outSock = master.fd_array[i];
+
+		std::ostringstream oss;
+		oss << "SOCKET #" << outSock << ": IS ONLINE TEST" << buf << "\r\n";
+		//std::string strOut = oss.str();
+
+		std::cout << outSock<< std::endl;
+		//send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+		//if (outSock != serverSocket && outSock != sock)
+		//{
+		//	std::ostringstream ss;
+		//	ss << "SOCKET #" << sock << ": IS ONLINE" << buf << "\r\n";
+		//	std::string strOut = ss.str();
+		//
+		//	send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+		//}
+	}
+}
 
 int main()
 {
@@ -40,7 +69,6 @@ int main()
 		return 1;
 	}
 
-	SOCKET serverSocket;
 	serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (serverSocket == INVALID_SOCKET)
@@ -76,7 +104,6 @@ int main()
 	printf("Waiting for connections...\n");
 
 	//Create the master file descriptor set and zero it
-	fd_set master;
 	FD_ZERO(&master);
 
 	FD_SET(serverSocket, &master);
@@ -92,7 +119,7 @@ int main()
 
 		for (int i = 0; i < socketCount; i++)
 		{
-			SOCKET sock = copy.fd_array[i];
+			sock = copy.fd_array[i];
 
 			if (sock == serverSocket)
 			{
@@ -105,10 +132,22 @@ int main()
 				//Send welcome message
 				std::string welcomeMsg = "Welcome asshole!\r\n";
 				send(clientSocket, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
+
+				for (int i = 0; i < master.fd_count; i++)
+				{
+					outSock = master.fd_array[i];
+					if (outSock != serverSocket && outSock != sock)
+					{
+						std::ostringstream ss;
+						ss << "SOCKET #" << clientSocket << ": IS ONLINE" << buf << "\r\n";
+						std::string strOut = ss.str();
+
+						send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+					}
+				}
 			}
 			else //inbound message
 			{
-				char buf[4096];
 				ZeroMemory(buf, 4096);
 
 				//Receive message
@@ -119,6 +158,22 @@ int main()
 					//Drop the client
 					closesocket(sock);
 					FD_CLR(sock, &master);
+				}
+				else if (buf[0]== 'd')
+				{
+					printOnline();
+				}
+				else if (buf[0] == 's')
+				{
+					std::cout << serverSocket << std::endl;
+				}
+				else if (buf[0] == 'o')
+				{
+					std::cout << outSock << std::endl;
+				}
+				else if (buf[0] == 'o')
+				{
+					std::cout << sock << std::endl;
 				}
 				else
 				{
@@ -141,7 +196,7 @@ int main()
 
 					for (int i = 0; i < master.fd_count; i++)
 					{
-						SOCKET outSock = master.fd_array[i];
+						outSock = master.fd_array[i];
 						if (outSock != serverSocket && outSock != sock)
 						{
 							std::ostringstream ss;
