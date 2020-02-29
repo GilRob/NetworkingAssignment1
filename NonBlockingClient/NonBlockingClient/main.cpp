@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <sstream>
 
 #pragma comment(lib, "ws2_32.lib") //He did a capital 'W'
 
@@ -12,6 +13,7 @@ bool isRunning = true;
 char buf[4096];
 std::string userInput;
 std::string ipAddress;
+std::string user;
 
 ///FUNCTION TO RECIEVE MESSAGES///
 void MsgReceive()
@@ -36,8 +38,11 @@ void MsgSend()
 		std::getline(std::cin, userInput);
 		if (userInput.size() > 0)		// Make sure the user has typed in something
 		{
+			std::ostringstream ss;
+			ss << user << ": " << userInput.c_str() << "\r\n";
+			std::string strOut =  ss.str();
 			// Send the text
-			int sendResult = send(cliSocket, userInput.c_str(), userInput.size() + 1, 0);
+			int sendResult = send(cliSocket, strOut.c_str(), strOut.size() + 1, 0);
 		}
 	}
 }
@@ -100,6 +105,8 @@ int main()
 
 	printf("Connected to the server\n");
 
+	std::cout << "Enter your username> ";
+	std::getline(std::cin, user);
 
 	//Create a buffer
 

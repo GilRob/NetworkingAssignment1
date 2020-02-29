@@ -198,7 +198,7 @@ int main()
 					closesocket(sock);
 					FD_CLR(sock, &master);
 				}
-				else if (buf[0] == 'g')
+				else if (buf[0] == ';')
 				{
 					std::cout << "in game" << std::endl;
 					//copyGame = gameSockets;
@@ -210,7 +210,7 @@ int main()
 					FD_CLR(sock, &master);
 					
 				}
-				else if (buf[0]== 'd')
+				else if (buf[0]== '.')
 				{
 					printOnline();
 				}
@@ -273,14 +273,14 @@ int main()
 					for (int i = 0; i < master.fd_count; i++)
 					{
 						outSock = master.fd_array[i];
-							if (outSock != serverSocket && outSock != sock)
-							{
-								std::ostringstream ss;
-								ss << "SOCKET #" << sock << ": " << buf << "\r\n";
-								std::string strOut = ss.str();
+						if (outSock != serverSocket && outSock != sock)
+						{
+							std::ostringstream ss;
+							ss <<"SOCKET #" << sock << " - " << buf << "\r\n";
+							std::string strOut = ss.str();
 
-								send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-							}
+							send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+						}
 							
 					}
 					for (int j = 0; j < gameSockets.fd_count; j++)
