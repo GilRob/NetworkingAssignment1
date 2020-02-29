@@ -1,3 +1,9 @@
+//----------------------
+///JESSICA LE - 100555079
+///GIL ROBERN - 100651824
+//----------------------
+
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
@@ -16,6 +22,7 @@ SOCKET outSock;
 SOCKET outGame;
 SOCKET clientSocket;
 
+/// FUNCTION TO PRINT WHO IS ONLINE ///
 void printOnline()
 {
 	//for the number of sockets in master (where its stored)
@@ -36,18 +43,10 @@ void printOnline()
 			send(master.fd_array[j], strOut.c_str(), strOut.size() + 1, 0);
 		}
 		std::cout << i << std::endl;
-		//send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-		//if (outSock != serverSocket && outSock != sock)
-		//{
-		//    std::ostringstream ss;
-		//    ss << "SOCKET #" << sock << ": IS ONLINE" << buf << "\r\n";
-		//    std::string strOut = ss.str();
-		//
-		//    send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-		//}
 	}
 }
 
+/// DEBUG TEST TO SEE WHO IS IN GAME ///
 void printGame()
 {
 	//for the number of sockets in master (where its stored)
@@ -60,15 +59,6 @@ void printGame()
 		//std::string strOut = oss.str();
 
 		std::cout << outGame << std::endl;
-		//send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-		//if (outSock != serverSocket && outSock != sock)
-		//{
-		//	std::ostringstream ss;
-		//	ss << "SOCKET #" << sock << ": IS ONLINE" << buf << "\r\n";
-		//	std::string strOut = ss.str();
-		//
-		//	send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-		//}
 	}
 }
 
@@ -127,14 +117,6 @@ int main()
 
 	//Listen on socket
 
-	//if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR)
-	//{
-	//	printf("Listen failed: %d\n", WSAGetLastError());
-	//	closesocket(serverSocket);
-	//	freeaddrinfo(ptr);
-	//	WSACleanup();
-	//	return 1;
-	//}
 	listen(serverSocket, SOMAXCONN);
 
 	printf("Waiting for connections...\n");
@@ -172,13 +154,14 @@ int main()
 				std::string welcomeMsg = "Welcome asshole!\r\n";
 				send(clientSocket, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
 
+				/// WHEHN SOMEONE IS ONLINE SEND THE CURRENT ONLINE CLIENTS THAT SOMEONE HAS JOINED ///
 				for (int i = 0; i < master.fd_count; i++)
 				{
 					outSock = master.fd_array[i];
 					if (outSock != serverSocket && outSock != sock)
 					{
 						std::ostringstream ss;
-						ss << "SOCKET #" << clientSocket << ": IS ONLINE" << buf << "\r\n";
+						ss << "SOCKET #" << clientSocket << ": IS ONLINE" <<"\r\n";
 						std::string strOut = ss.str();
 
 						send(outSock, strOut.c_str(), strOut.size() + 1, 0);
@@ -201,39 +184,24 @@ int main()
 				else if (buf[0] == ';')
 				{
 					std::cout << "in game" << std::endl;
-					//copyGame = gameSockets;
-					//SOCKET clientSocket = accept(serverSocket, nullptr, nullptr);
-					//SOCKET inGame = accept(serverSocket, nullptr, nullptr);
-					//Add new connection
-					//FD_CLR(sock, &master);
 					FD_SET(sock, &gameSockets);
-					FD_CLR(sock, &master);
+					
+					// this doesn't work for some reason ?????
+					//FD_CLR(sock, &master);
 					
 				}
 				else if (buf[0]== '.')
 				{
 					printOnline();
 				}
-				else if (buf[0] == 's')
+				else if (buf[0] == '1')
 				{
-					std::cout << serverSocket << std::endl;
-				}
-				else if (buf[0] == 'o')
-				{
-					std::cout << outSock << std::endl;
-				}
-				else if (buf[0] == 'o')
-				{
-					std::cout << sock << std::endl;
-				}
-				else if (buf[0] == 'v')
-				{
+					/// DEBUG TO PRINT WHOS IN GAME ///
 					for (int u = 0; u < gameSockets.fd_count; u++)
 					{
 						outGame = gameSockets.fd_array[u];
 						std::cout << outGame << std::endl;
 					}
-					//zprintGame();
 				}
 				//Check to see if it is a command. \quit kills the server
 				else if (buf[0] == '-')
@@ -267,9 +235,14 @@ int main()
 						//unknown command
 						continue;
 					}
-
+					else if (*buf == 't')
+					{
+						std::cout << "this works" << std::endl;
+						continue;
+					}
 					//Send message to other clients, and definiately NOT the listening socket
 					
+					///SEND TO PPL IN CHAT ///
 					for (int i = 0; i < master.fd_count; i++)
 					{
 						outSock = master.fd_array[i];
@@ -283,6 +256,8 @@ int main()
 						}
 							
 					}
+
+					/// SEND TO PPL IN GAME ///
 					for (int j = 0; j < gameSockets.fd_count; j++)
 					{
 						outGame = gameSockets.fd_array[j];
@@ -295,18 +270,7 @@ int main()
 							send(outGame, outP.c_str(), outP.size() + 1, 0);
 						}
 					}
-					//for (int i = 0; i < gameSockets.fd_count; i++)
-					//{
-					//	outGame = gameSockets.fd_array[i];
-					//	if (outGame != serverSocket && outGame != sock)
-					//	{
-					//		std::ostringstream ss;
-					//		ss << "TEST" << buf << "\r\n";
-					//		std::string outP = ss.str();
-					//
-					//		send(outSock, outP.c_str(), outP.size() + 1, 0);
-					//	}
-					//}
+					
 				}
 			}
 		}
