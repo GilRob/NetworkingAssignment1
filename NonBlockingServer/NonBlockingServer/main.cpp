@@ -151,7 +151,7 @@ int main()
 				FD_SET(clientSocket, &master);
 
 				//Send welcome message
-				std::string welcomeMsg = "Welcome asshole!\r\n";
+				std::string welcomeMsg = "Welcome to the server!\r\n";
 				send(clientSocket, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
 
 				/// WHEHN SOMEONE IS ONLINE SEND THE CURRENT ONLINE CLIENTS THAT SOMEONE HAS JOINED ///
@@ -181,7 +181,7 @@ int main()
 					closesocket(sock);
 					FD_CLR(sock, &master);
 				}
-				else if (buf[0] == ';')
+				else if (buf[0] == '1')
 				{
 					std::cout << "in game" << std::endl;
 					FD_SET(sock, &gameSockets);
@@ -190,11 +190,11 @@ int main()
 					//FD_CLR(sock, &master);
 					
 				}
-				else if (buf[0]== '.')
+				else if (buf[0]== '2')
 				{
 					printOnline();
 				}
-				else if (buf[0] == '1')
+				else if (buf[0] == '3')
 				{
 					/// DEBUG TO PRINT WHOS IN GAME ///
 					for (int u = 0; u < gameSockets.fd_count; u++)
@@ -204,7 +204,7 @@ int main()
 					}
 				}
 				//Check to see if it is a command. \quit kills the server
-				else if (buf[0] == '-')
+				else if (buf[0] == '0')
 				{
 					running = false;
 					break;
@@ -235,7 +235,7 @@ int main()
 						//unknown command
 						continue;
 					}
-					else if (*buf == 't')
+					else if (*buf == '4')
 					{
 						std::cout << "this works" << std::endl;
 						continue;

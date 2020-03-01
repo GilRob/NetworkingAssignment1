@@ -1,0 +1,6 @@
+﻿  main.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 180 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  NonBlockingClient.vcxproj -> C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingClient\Release\NonBlockingClient.exe

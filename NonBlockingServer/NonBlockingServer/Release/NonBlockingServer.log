@@ -1,0 +1,14 @@
+﻿  main.cpp
+C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(29,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(41,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(53,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(158,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(200,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(246,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\NonBlockingServer\main.cpp(261,24): warning C4018: '<': signed/unsigned mismatch
+  Generating code
+  1 of 127 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  NonBlockingServer.vcxproj -> C:\Users\Gil\Documents\Third Year\Networking\Assignment1\NetworkingAssignment1\NonBlockingServer\Release\NonBlockingServer.exe
